@@ -1,7 +1,7 @@
 from flask import (Flask, render_template, request,Blueprint)
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
-
+#Initializing Database
 db = SQLAlchemy()
 
 
@@ -15,6 +15,7 @@ def create_app():
     
     with app.app_context():
 
+        #Register BluePrint
         from .ticket_api import ticket_bp as ticket_blueprint
         app.register_blueprint(ticket_blueprint)
         
