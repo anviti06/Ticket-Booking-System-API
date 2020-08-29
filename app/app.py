@@ -17,14 +17,14 @@ def create_app():
     from .models import Ticket
 
     with app.app_context():
-        #Desiging the scheduler function
+        #Desiging the scheduler function 
         from .utilites import isActive 
-        def markExpiredTickets():
+        def deleteExpiredTickets():
             with app.app_context():
                 ticket_list = Ticket.query.all()
                 for ticket in ticket_list:
-                    if not ticket.isExpired and not isActive(ticket.showTime):
-                        result = Ticket.query.filter_by(ticketId = ticket.ticketId).update(dict(isExpired = True))
+                    if ticket.isExpired or not isActive(ticket.showTime):
+                        db.session.delete(ticket)
                         db.session.commit()
             return
 
@@ -34,7 +34,7 @@ def create_app():
         app.register_blueprint(ticket_blueprint)
         
         #Initializing Scheduler - marking of tickets as expired will occur every 5 seconds
-        scheduler.add_job(markExpiredTickets, 'interval', seconds=5)          
+        scheduler.add_job(deleteExpiredTickets, 'interval', seconds=5)          
         scheduler.start()
         
 
