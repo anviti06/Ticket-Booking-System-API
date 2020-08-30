@@ -87,6 +87,13 @@ The system is built to serve as a ticket booking system for a movie theatre. It 
 		 - expiry limit of showTime entered by user before inserting into table.
 		 - ticket to be updated exists in table.  
 		
+	<div align="center">
+		
+	<img src="https://images2.imgbox.com/17/03/NZGYE0Ac_o.png" alt="image host"/>
+	
+	<h5> Updating time on ticket
+		
+	</div>
 		 
 	 
  3. [`/ticket/delete`](https://github.com/anviti06/Ticket-Booking-System-API/blob/6948880b306921d83c43011cef80f0cae1b2138a/app/ticket_api.py#L100):
@@ -96,8 +103,13 @@ The system is built to serve as a ticket booking system for a movie theatre. It 
 		 - expiry limit of showTime entered by user before inserting into table.
 		 - ticket to be updated exists in table.  
 		 
+		 <div align ="center">
+		 
+		 <img src="https://images2.imgbox.com/c5/11/Po0LHqFZ_o.png" alt="image host"/>
+		 
+		 </div>
 		
-		
+		<br>
 
 <br>
 
@@ -152,6 +164,12 @@ The system is built to serve as a ticket booking system for a movie theatre. It 
 - **Background scheduler** from **[APScheduler library](https://apscheduler.readthedocs.io/en/stable/userguide.html)** in Flask is used.
 - The scheduler checks all entities of ticket_record table for the expiry of tickets(based on time difference of current time & show time) and marks those entites as expiried. **It then also deletes those entities from table.**
 
+
 <br>
 
+<div align ="center">
+	
+<img src="https://images2.imgbox.com/29/32/0eVkKjBy_o.png" alt="image host"/>
+	
+</div>
 <br>
