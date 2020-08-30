@@ -41,7 +41,7 @@ The system is built to serve as a ticket booking system for a movie theatre. It 
 
 <img src="https://i.ibb.co/2sQz2TB/Untitled-drawing2.png" alt="Untitled-drawing2" border="0">
 
-<div>
+</div>
 
 ## How to run ?
 1. #### Go to the project repository and download the requirements file 
