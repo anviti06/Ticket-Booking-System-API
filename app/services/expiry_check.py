@@ -1,5 +1,5 @@
-from .app import db
-from .models import Ticket,User
+from app.app import db
+from app.models import Ticket,User
 from datetime import datetime, timedelta
 
 """

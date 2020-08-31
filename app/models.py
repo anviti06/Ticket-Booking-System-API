@@ -15,4 +15,3 @@ class Ticket(db.Model):
     isExpired = db.Column(db.Boolean , default=False)
     
 
-

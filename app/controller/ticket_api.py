@@ -1,9 +1,9 @@
 from flask import Flask,Blueprint,request,jsonify
-from .app import db
-from .models import Ticket,User
+from app.app import db
+from app.models import Ticket,User
 from sqlalchemy import update
-from .utilites import isActive
-		
+from app.services.expiry_check import isActive
+from app.services.ticket import book_ticket
 ticket_bp = Blueprint('ticket_bp', __name__)
 
 
@@ -18,39 +18,11 @@ ticket_bp = Blueprint('ticket_bp', __name__)
 
 @ticket_bp.route('/ticket/book' , methods = ['POST' , 'GET'])
 def book_new():
-
 	if request.method =="POST":
 		data = request.get_json()
-		user_name = data['userName']
-		phone_no = data['phoneNo']
-		show_time = data['showTime']
-
-		#Condition for Expiry : curTime - showTime < 8hr
-		if not isActive(show_time):
-			return {'result' : 'Enter valid Time'}
-
-		#Checking Ticket count
-		count = Ticket.query.filter_by(showTime = show_time).count()
-		if count > 20:
-			return { 'result' : 'Failure - Housefull!! More than 20 Tickets Exist!'} 
-		
-		user = User.query.filter_by(userName = user_name , phoneNo = phone_no).first()
-		print(user)
-		if not user:
-			new_user = User(userName = user_name , phoneNo = phone_no)
-			db.session.add(new_user)
-			db.session.commit()
-			user = User.query.filter_by(userName = user_name , phoneNo = phone_no).first()	
-			print(user)
-
-
-		new_entry = Ticket(userId = user.userId ,showTime = show_time)
-		db.session.add(new_entry)
-		db.session.commit()
-		
-		return { 'result' : 'Success - Ticket booked'}
-
+		return book_ticket(data)
 	return { 'result' : 'failure'}
+
 		
 
 

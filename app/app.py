@@ -1,43 +1,33 @@
 from flask import (Flask, render_template, request,Blueprint)
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
+from .config import config_type
 from apscheduler.schedulers.background import BackgroundScheduler
 
+
 db = SQLAlchemy()
-scheduler = BackgroundScheduler(daemon=True)    
 
-
-def create_app():
+def create_app(config_name):
     
-    app = Flask(__name__, instance_relative_config=False)
-    app.config.from_object('config.Config')
+    app = Flask(__name__)
+    app.config.from_object(config_type[config_name])
     db.init_app(app)
 
-    #Importing Databse Models
-    from .models import Ticket
-
     with app.app_context():
-        #Desiging the scheduler function 
-        from .utilites import isActive 
-        def deleteExpiredTickets():
-            with app.app_context():
-                ticket_list = Ticket.query.all()
-                for ticket in ticket_list:
-                    if ticket.isExpired or not isActive(ticket.showTime):
-                        db.session.delete(ticket)
-                        db.session.commit()
-            return
-
-
         #Registering Blueprints
-        from .ticket_api import ticket_bp as ticket_blueprint
+        from .controller.ticket_api import ticket_bp as ticket_blueprint
         app.register_blueprint(ticket_blueprint)
         
-        #Initializing Scheduler - marking of tickets as expired will occur every 5 seconds
-        scheduler.add_job(deleteExpiredTickets, 'interval', seconds=5)          
+        #Initializing Scheduler - checking for expiry every hour and deleting them every 8 hours
+        scheduler = BackgroundScheduler(daemon=True)
+        from .utilites.scheduler_jobs import markExpiredTickets, deleteExpiredTickets
+        scheduler.add_job(markExpiredTickets, 'interval', seconds = 60*60)    #Every Hour          
+        scheduler.add_job(deleteExpiredTickets, 'interval', seconds= 8*60*60)    #Evry 8 hour           
         scheduler.start()
         
 
         #db.create_all()
         return app
-    
+
+
+
