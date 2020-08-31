@@ -32,3 +32,34 @@ def book_ticket(data):
 		
     return { 'result' : 'Success - Ticket booked'}
 
+
+def update_time(data):
+    ticket_id = data['ticketId']
+    show_time = data['showTime']
+		
+		#Checking Show time for expiry
+    if(not isActive(show_time)):
+        return {'result': 'Enter a Valid Time'}
+
+    ticket = Ticket.query.filter_by(ticketId = ticket_id).first()
+		
+    if not ticket:
+        return {'result' : 'Failure - No Ticket could be found!'}
+		
+    ticket = Ticket.query.filter_by(ticketId = ticket_id).update(dict(showTime = show_time))
+    db.session.commit()
+        
+    return { 'result' : 'Success - Timings Updated'}
+
+def delete_ticket(data):
+    ticket_id = data['ticketId']
+		
+    ticket = Ticket.query.get(ticket_id)
+		
+    if not ticket:
+        return {'result' : 'Failure - No Ticket could be found!'}
+		
+    db.session.delete(ticket)
+    db.session.commit()
+        
+    return { 'result' : 'Success - Record Deleted'}

@@ -3,7 +3,8 @@ from app.app import db
 from app.models import Ticket,User
 from sqlalchemy import update
 from app.services.expiry_check import isActive
-from app.services.ticket import book_ticket
+from app.services.ticket import book_ticket, update_time, delete_ticket
+from app.services.view import view_user, view_ticket
 ticket_bp = Blueprint('ticket_bp', __name__)
 
 
@@ -23,8 +24,6 @@ def book_new():
 		return book_ticket(data)
 	return { 'result' : 'failure'}
 
-		
-
 
 
 """
@@ -36,30 +35,12 @@ def book_new():
 """
 
 @ticket_bp.route('/ticket/update/time' , methods = ['POST' , 'GET'])
-def update_time():
+def updateTime():
 	if request.method =="POST":
-
 		data = request.get_json()
-		ticket_id = data['ticketId']
-		show_time = data['showTime']
-		
-		#Checking Show time for expiry
-		if(not isActive(show_time)):
-			return {'result': 'Enter a Valid Time'}
-
-		ticket = Ticket.query.filter_by(ticketId = ticket_id).first()
-		
-		if not ticket:
-			return {'result' : 'Failure - No Ticket could be found!'}
-		
-		ticket = Ticket.query.filter_by(ticketId = ticket_id).update(dict(showTime = show_time))
-		db.session.commit()
-        
-		return { 'result' : 'Success - Timings Updated'}
+		return update_time(data)
 
 	return { 'result' : 'failure' }
-
-
 
 
 """
@@ -70,24 +51,12 @@ def update_time():
 			failure - could not be deleted / Ticket does not exist 
 """
 @ticket_bp.route('/ticket/delete' , methods = ['POST' , 'GET'])
-def delete_ticket():
+def delete():
 
 	if request.method =="POST":
 		data = request.get_json()
-		ticket_id = data['ticketId']
-		
-		ticket = Ticket.query.get(ticket_id)
-		
-		if not ticket:
-			return {'result' : 'Failure - No Ticket could be found!'}
-		
-		db.session.delete(ticket)
-		db.session.commit()
-        
-		return { 'result' : 'Success - Record Deleted'}
-
+		return delete_ticket(data)
 	return { 'result' : 'failure' }
-
 
 
 
@@ -103,24 +72,8 @@ def view_time():
 
 	if request.method =="POST":
 		data = request.get_json()
-		show_time = data['showTime']
-
-		data = []
-		ticket_list = Ticket.query.filter_by(showTime = show_time)
-		
-		for ticket in ticket_list:
-			user = User.query.filter_by(userId = ticket.userId).first()
-			dict = {'ticketId' : ticket.ticketId , 'userName' : user.userName, 'phoneNo': user.phoneNo, 'showTime': ticket.showTime, 'isExpired': ticket.isExpired}
-			data.append(dict)
-		return jsonify(data)
-	
+		return view_ticket(data)
 	return {'result': 'failure'}
-
-
-
-
-
-
 
 """
 	Case 5: Show user Details of a particular ticket
@@ -131,20 +84,11 @@ def view_time():
 """
 
 @ticket_bp.route('/ticket/view/user' , methods = ['POST' , 'GET'])
-def view_user():
+def user():
 
 	if request.method =="POST":
 		data = request.get_json()
-		ticket_id = data['ticketId']
-		ticket = Ticket.query.filter_by(ticketId = ticket_id).first()
-		
-		if not ticket or ticket.isExpired:
-			return {'result' : 'Failure-Ticket could not be found'}
-		
-		user = User.query.filter_by(userId = ticket.userId).first()
-		dict = {'userName' : user.userName ,'phoneNo': user.phoneNo}
-		return dict
-	
+		return view_user(data)	
 	return {'result': 'failure'}
 
 
