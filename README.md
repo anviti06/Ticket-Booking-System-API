@@ -47,9 +47,10 @@ The system is built to serve as a ticket booking system for a movie theatre. It 
 1. #### Go to the project repository and download the requirements file 
 		pip install -r requirements.txt
 2. #### Running the Flask app - Go to the terminal of the root project directory and type:
-		python main.py
+		python main.py run
 
-	##### For testing, requests can be send through POSTMAN software and corresponding output can be visualized.
+   #### For testing
+   		python main.py test
 
 <br>
 
@@ -61,7 +62,7 @@ The system is built to serve as a ticket booking system for a movie theatre. It 
 
 ### Endpoints:
 
- 1.  [`/ticket/book`](https://github.com/anviti06/Ticket-Booking-System-API/blob/6948880b306921d83c43011cef80f0cae1b2138a/app/ticket_api.py#L19):  
+ 1.  [`/ticket/book`](https://github.com/anviti06/Ticket-Booking-System-API/blob/61da8f906b3ddb4c38ce65b03ac43de687fd1550/app/controller/ticket_api.py#L20):  
 	 - ***Input:** User's Name, Phone Number, Ticket Show time*
 	 -  The UserId of particular User is fetched using the userName & phoneNo in the user_record table (If user does not exists then it is first added in record and then userId is fetched).
 	 - New Record is made in ticket_record table using the userId, showTime, isExpired(default = false) fields with respective values.
@@ -80,7 +81,7 @@ The system is built to serve as a ticket booking system for a movie theatre. It 
 		<br>
 		
 
- 2. [`/ticket/update/time`](https://github.com/anviti06/Ticket-Booking-System-API/blob/6948880b306921d83c43011cef80f0cae1b2138a/app/ticket_api.py#L66):
+ 2. [`/ticket/update/time`](https://github.com/anviti06/Ticket-Booking-System-API/blob/61da8f906b3ddb4c38ce65b03ac43de687fd1550/app/controller/ticket_api.py#L37):
 	 - ***Input:** Ticket Id, new Show Time to be updated*
 	 -  Ticket entity is fetched using the ticketId from ticket_record and then the the showTime is updated with the new time.
 	 - **Conditions Checked:** 
@@ -96,7 +97,7 @@ The system is built to serve as a ticket booking system for a movie theatre. It 
 	</div>
 		 
 	 
- 3. [`/ticket/delete`](https://github.com/anviti06/Ticket-Booking-System-API/blob/6948880b306921d83c43011cef80f0cae1b2138a/app/ticket_api.py#L100):
+ 3. [`/ticket/delete`](https://github.com/anviti06/Ticket-Booking-System-API/blob/61da8f906b3ddb4c38ce65b03ac43de687fd1550/app/controller/ticket_api.py#L53):
 	 - ***Input:** Ticket Id*
 	 -  Ticket entity is fetched using the ticketId from ticket_record and delete operation is performed for that ticket.
 	 - **Conditions Checked:** 
@@ -113,7 +114,7 @@ The system is built to serve as a ticket booking system for a movie theatre. It 
 
 <br>
 
- 4. [`/ticket/view/time`](https://github.com/anviti06/Ticket-Booking-System-API/blob/6948880b306921d83c43011cef80f0cae1b2138a/app/ticket_api.py#L129):
+ 4. [`/ticket/view/time`](https://github.com/anviti06/Ticket-Booking-System-API/blob/61da8f906b3ddb4c38ce65b03ac43de687fd1550/app/controller/ticket_api.py#L70):
 	 - ***Input:** Show Time*
 	 -  For each entity in ticket_record having showTime same as input, the userId from ticket_record table is use to fetch corresponding user details. 
 	 - All these fetched entities are returned in json format.   
@@ -130,7 +131,7 @@ The system is built to serve as a ticket booking system for a movie theatre. It 
 <br>
 
 
- 5. [`/ticket/view/user`](https://github.com/anviti06/Ticket-Booking-System-API/blob/6948880b306921d83c43011cef80f0cae1b2138a/app/ticket_api.py#L161):
+ 5. [`/ticket/view/user`](https://github.com/anviti06/Ticket-Booking-System-API/blob/61da8f906b3ddb4c38ce65b03ac43de687fd1550/app/controller/ticket_api.py#L86):
  	 - ***Input:** Ticket Id*
 	 -  For the particular ticketId, the corresponding userId is used to fetch user's detail form user_record table.
 	 - The details are returned in json format.  
@@ -149,7 +150,7 @@ The system is built to serve as a ticket booking system for a movie theatre. It 
 <br>
 
 ### Checking Expiry of Tickets:
-*Function implemented:* [isActive()](https://github.com/anviti06/Ticket-Booking-System-API/blob/f45f4bcff13880654fd9167c0bdd28c2534f675d/app/utilites.py#L8) 
+*Function implemented:* [isActive()](https://github.com/anviti06/Ticket-Booking-System-API/blob/61da8f906b3ddb4c38ce65b03ac43de687fd1550/app/services/expiry_check.py#L8) 
 - All tickets in which the Show Time is eight or more hours before the current time are considered to be expired.
 	
 	<div align = "center" >
@@ -160,10 +161,10 @@ The system is built to serve as a ticket booking system for a movie theatre. It 
 <br>
 
 ### Scheduler Design:
-*Function Implemented:* [deleteExpiredTickets()](https://github.com/anviti06/Ticket-Booking-System-API/blob/f45f4bcff13880654fd9167c0bdd28c2534f675d/app/app.py#L22)
+*Function Implemented:* [markExpiredTickets()](https://github.com/anviti06/Ticket-Booking-System-API/blob/61da8f906b3ddb4c38ce65b03ac43de687fd1550/app/utilites/scheduler_jobs.py#L5) , [deleteExpiredTickets()](https://github.com/anviti06/Ticket-Booking-System-API/blob/61da8f906b3ddb4c38ce65b03ac43de687fd1550/app/utilites/scheduler_jobs.py#L14)
 - **Background scheduler** from **[APScheduler library](https://apscheduler.readthedocs.io/en/stable/userguide.html)** in Flask is used.
-- The scheduler checks all entities of ticket_record table for the expiry of tickets(based on time difference of current time & show time) and marks those entites as expiried. **It then also deletes those entities from table.**
-
+- The scheduler checks all entities of ticket_record table for the expiry of tickets(based on time difference of current time & show time) and marks those entites as expiried every hour.
+- It then deletes those expired records from database every 8 hours automatically.
 
 <br>
 
@@ -172,4 +173,9 @@ The system is built to serve as a ticket booking system for a movie theatre. It 
 <img src="https://images2.imgbox.com/29/32/0eVkKjBy_o.png" alt="image host"/>
 	
 </div>
+
 <br>
+
+### Test Cases:
+*Sample Test cases are written for checking the endpoints*
+ - File: [ticket_test](https://github.com/anviti06/Ticket-Booking-System-API/blob/61da8f906b3ddb4c38ce65b03ac43de687fd1550/app/test/ticket_test.py#L1)
